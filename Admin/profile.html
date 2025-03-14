@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - Career Management System</title>
+    <link rel="stylesheet" href="assets/compiled/css/app.css">
+    <link rel="stylesheet" href="assets/compiled/css/app-dark.css">
+    <link rel="stylesheet" href="assets/compiled/css/iconly.css">
+</head>
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header position-relative">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="logo">
+                            <a href="index.html">CMS</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-item">
+                            <a href="index.html" class="sidebar-link">
+                                <i class="bi bi-grid-fill"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item active">
+                            <a href="profile.html" class="sidebar-link">
+                                <i class="bi bi-person-fill"></i>
+                                <span>My Profile</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="home.html" class="sidebar-link">
+                                <i class="bi bi-person-fill"></i>
+                                <span>Home</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="applications.html" class="sidebar-link">
+                                <i class="bi bi-file-earmark-text-fill"></i>
+                                <span>My Applications</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="interviews.html" class="sidebar-link">
+                                <i class="bi bi-calendar-event-fill"></i>
+                                <span>Interviews</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="handleLogout()">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+            
+            <div class="page-heading">
+                <div class="row">
+                    <div class="col-12 col-md-6 order-md-1 order-last">
+                        <h3>My Profile</h3>
+                    </div>
+                    <div class="col-12 col-md-6 order-md-2 order-first">
+                        <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                            <button class="btn btn-primary" onclick="editProfile()">
+                                <i class="bi bi-pencil"></i> Edit Profile
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <section class="row">
+                    <div class="col-12 col-lg-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-center align-items-center flex-column">
+                                    <div class="avatar avatar-xl">
+                                        <img src="assets/compiled/jpg/1.jpg" alt="Profile" id="userProfileImage">
+                                    </div>
+                                    <h4 class="mt-3" id="userFullName">Loading...</h4>
+                                    <p class="text-small" id="userJobTitle">Loading...</p>
+                                </div>
+                                <div class="mt-4">
+                                    <h6>Contact Information</h6>
+                                    <div class="mt-3">
+                                        <p><i class="bi bi-envelope"></i> <span id="userEmail">Loading...</span></p>
+                                        <p><i class="bi bi-phone"></i> <span id="userPhone">Loading...</span></p>
+                                        <p><i class="bi bi-geo-alt"></i> <span id="userLocation">Loading...</span></p>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <h6>Skills</h6>
+                                    <div class="mt-3" id="userSkills">
+                                        <!-- Skills will be loaded dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-8">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>Professional Summary</h5>
+                                <p id="userProfessionalSummary">Loading...</p>
+
+                                <h5 class="mt-4">Work Experience</h5>
+                                <div id="workExperienceContainer">
+                                    <!-- Work experience will be loaded dynamically -->
+                        </div>
+
+                                <h5 class="mt-4">Education</h5>
+                                <div id="educationContainer">
+                                    <!-- Education will be loaded dynamically -->
+                        </div>
+
+                                <h5 class="mt-4">Certifications</h5>
+                                <div id="certificationsContainer">
+                                    <!-- Certifications will be loaded dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/static/js/initTheme.js"></script>
+    <script src="assets/static/js/components/dark.js"></script>
+    <script src="assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="assets/compiled/js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Load user data when page loads
+        document.addEventListener('DOMContentLoaded', loadUserData);
+
+        async function loadUserData() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = 'auth-login.html';
+                    return;
+                }
+
+                const response = await fetch('/api/profile', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load user data');
+                }
+
+                const user = await response.json();
+                updateProfileUI(user);
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load profile data. Please try again later.'
+                }).then(() => {
+                    // If there's an authentication error, redirect to login
+                    if (error.message.includes('401') || error.message.includes('auth')) {
+                        localStorage.removeItem('token');
+                        window.location.href = 'auth-login.html';
+                    }
+                });
+            }
+        }
+
+        function updateProfileUI(user) {
+            // Update profile image
+            document.getElementById('userProfileImage').src = user.profileImage || 'assets/compiled/jpg/1.jpg';
+            
+            // Update basic info
+            document.getElementById('userFullName').textContent = user.fullName || 'N/A';
+            document.getElementById('userJobTitle').textContent = user.jobTitle || 'N/A';
+            document.getElementById('userEmail').textContent = user.email || 'N/A';
+            document.getElementById('userPhone').textContent = user.phone || 'N/A';
+            document.getElementById('userLocation').textContent = user.location || 'N/A';
+            
+            // Update skills
+            const skillsContainer = document.getElementById('userSkills');
+            if (user.skills && user.skills.length > 0) {
+                skillsContainer.innerHTML = user.skills.map(skill => 
+                    `<span class="badge bg-primary me-1 mb-1">${skill}</span>`
+                ).join('');
+            } else {
+                skillsContainer.innerHTML = '<p class="text-muted">No skills listed</p>';
+            }
+
+            // Update professional summary
+            document.getElementById('userProfessionalSummary').textContent = user.professionalSummary || 'No professional summary available';
+
+            // Update work experience
+            const workExpContainer = document.getElementById('workExperienceContainer');
+            if (user.workExperience && user.workExperience.length > 0) {
+                workExpContainer.innerHTML = user.workExperience.map(exp => `
+                    <div class="work-experience-item mb-4">
+                        <h6>${exp.title} at ${exp.company}</h6>
+                        <p class="text-muted mb-2">${formatDate(exp.startDate)} - ${formatDate(exp.endDate)}</p>
+                        <p>${exp.description.join('<br>')}</p>
+                    </div>
+                `).join('');
+            } else {
+                workExpContainer.innerHTML = '<p class="text-muted">No work experience listed</p>';
+            }
+
+            // Update education
+            const educationContainer = document.getElementById('educationContainer');
+            if (user.education && user.education.length > 0) {
+                educationContainer.innerHTML = user.education.map(edu => `
+                    <div class="education-item mb-4">
+                        <h6>${edu.degree}</h6>
+                        <p class="text-muted mb-2">${edu.school}</p>
+                        <p>${edu.startYear} - ${edu.endYear}</p>
+                    </div>
+                `).join('');
+            } else {
+                educationContainer.innerHTML = '<p class="text-muted">No education listed</p>';
+            }
+
+            // Update certifications
+            const certContainer = document.getElementById('certificationsContainer');
+            if (user.certifications && user.certifications.length > 0) {
+                certContainer.innerHTML = user.certifications.map(cert => `
+                    <div class="certification-item mb-4">
+                        <h6>${cert.name}</h6>
+                        <p class="text-muted mb-2">Issued by ${cert.issuer}</p>
+                        <p>Year: ${cert.year} <span class="badge bg-${cert.status === 'Active' ? 'success' : 'warning'}">${cert.status}</span></p>
+                    </div>
+                `).join('');
+            } else {
+                certContainer.innerHTML = '<p class="text-muted">No certifications listed</p>';
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Present';
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long'
+            });
+        }
+        
+        function handleLogout() {
+            Swal.fire({
+                title: 'Logout',
+                text: 'Are you sure you want to logout?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, logout',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('token');
+                    window.location.href = 'auth-login.html';
+                }
+            });
+        }
+
+        function editProfile() {
+            Swal.fire({
+                title: 'Edit Profile',
+                html: `
+                    <form id="editProfileForm" class="text-start">
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="editName" value="${document.getElementById('userFullName').textContent}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Job Title</label>
+                            <input type="text" class="form-control" id="editJobTitle" value="${document.getElementById('userJobTitle').textContent}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="editPhone" value="${document.getElementById('userPhone').textContent}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Location</label>
+                            <input type="text" class="form-control" id="editLocation" value="${document.getElementById('userLocation').textContent}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Profile Picture</label>
+                            <input type="file" class="form-control" id="editProfilePic" accept="image/*">
+                        </div>
+                    </form>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Save Changes',
+                preConfirm: async () => {
+                    try {
+                        const formData = {
+                            fullName: document.getElementById('editName').value,
+                            jobTitle: document.getElementById('editJobTitle').value,
+                            phone: document.getElementById('editPhone').value,
+                            location: document.getElementById('editLocation').value
+                        };
+
+                        const profilePic = document.getElementById('editProfilePic').files[0];
+                        if (profilePic) {
+                            // Check file size (max 5MB)
+                            if (profilePic.size > 5 * 1024 * 1024) {
+                                throw new Error('Profile picture must be less than 5MB');
+                            }
+                            const base64Image = await convertFileToBase64(profilePic);
+                            formData.profileImage = base64Image;
+                        }
+
+                        const response = await fetch('/api/auth/profile', {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(formData)
+                        });
+
+                        if (!response.ok) {
+                            const error = await response.json();
+                            throw new Error(error.message || 'Failed to update profile');
+                        }
+
+                        // Show success message
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Profile Updated',
+                            text: 'Your profile has been updated successfully!'
+                        });
+
+                        // Reload user data
+                        loadUserData();
+
+                        return true;
+                    } catch (error) {
+                        Swal.showValidationMessage(`Request failed: ${error.message}`);
+                        return false;
+                    }
+                }
+            });
+        }
+
+        function convertFileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+    </script>
+</body>
+</html>

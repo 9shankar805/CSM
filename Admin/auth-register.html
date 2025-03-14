@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Career Management System</title>
+    
+    <link rel="shortcut icon" href="./assets/compiled/svg/favicon.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACEAAAAiCAYAAADRcLDBAAAEs2lUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNS41LjAiPgogPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgeG1sbnM6ZXhpZj0iaHR0cDovL25zLmFkb2JlLmNvbS9leGlmLzEuMC8iCiAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyIKICAgIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIKICAgIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIKICAgIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIgogICAgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIKICAgZXhpZjpQaXhlbFhEaW1lbnNpb249IjMzIgogICBleGlmOlBpeGVsWURpbWVuc2lvbj0iMzQiCiAgIGV4aWY6Q29sb3JTcGFjZT0iMSIKICAgdGlmZjpJbWFnZVdpZHRoPSIzMyIKICAgdGlmZjpJbWFnZUxlbmd0aD0iMzQiCiAgIHRpZmY6UmVzb2x1dGlvblVuaXQ9IjIiCiAgIHRpZmY6WFJlc29sdXRpb249Ijk2LjAiCiAgIHRpZmY6WVJlc29sdXRpb249Ijk2LjAiCiAgIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiCiAgIHBob3Rvc2hvcDpJQ0NQcm9maWxlPSJzUkdCIElFQzYxOTY2LTIuMSIKICAgeG1wOk1vZGlmeURhdGU9IjIwMjItMDMtMzFUMTA6NTA6MjMrMDI6MDAiCiAgIHhtcDpNZXRhZGF0YURhdGU9IjIwMjItMDMtMzFUMTA6NTA6MjMrMDI6MDAiPgogICA8eG1wTU06SGlzdG9yeT4KICAgIDxyZGY6U2VxPgogICAgIDxyZGY6bGkKICAgICAgc3RFdnQ6YWN0aW9uPSJwcm9kdWNlZCIKICAgICAgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWZmaW5pdHkgRGVzaWduZXIgMS4xMC4xIgogICAgICBzdEV2dDp3aGVuPSIyMDIyLTAzLTMxVDEwOjUwOjIzKzAyOjAwIi8+CiAgICA8L3JkZjpTZXE+CiAgIDwveG1wTU06SGlzdG9yeT4KICA8L3JkZjpEZXNjcmlwdGlvbj4KIDwvcmRmOlJERj4KPC94OnhtcG1ldGE+Cjw/eHBhY2tldCBlbmQ9InIiPz5V57uAAAABgmlDQ1BzUkdCIElFQzYxOTY2LTIuMQAAKJF1kc8rRFEUxz9maORHo1hYKC9hISNGTWwsRn4VFmOUX5uZZ36oeTOv954kW2WrKLHxa8FfwFZZK0WkZClrYoOe87ypmWTO7dzzud97z+nec8ETzaiaWd4NWtYyIiNhZWZ2TvE946WZSjqoj6mmPjE1HKWkfdxR5sSbgFOr9Ll/rXoxYapQVik8oOqGJTwqPL5i6Q5vCzeo6dii8KlwpyEXFL519LjLLw6nXP5y2IhGBsFTJ6ykijhexGra0ITl5bRqmWU1fx/nJTWJ7PSUxBbxJkwijBBGYYwhBgnRQ7/MIQIE6ZIVJfK7f/MnyUmuKrPOKgZLpEhj0SnqslRPSEyKnpCRYdXp/9++msneoFu9JgwVT7b91ga+LfjetO3PQ9v+PgLvI1xkC/m5A+h7F32zoLXug38dzi4LWnwHzjeg8UGPGbFfySvuSSbh9QRqZ6H+Gqrm3Z7l9zm+h+iafNUV7O5Bu5z3L/wAdthn7QIme0YAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAJTSURBVFiF7Zi9axRBGIefEw2IdxFBRQsLWUTBaywSK4ubdSGVIY1Y6HZql8ZKCGIqwX/AYLmCgVQKfiDn7jZeEQMWfsSAHAiKqPiB5mIgELWYOW5vzc3O7niHhT/YZvY37/swM/vOzJbIqVq9uQ04CYwCI8AhYAlYAB4Dc7HnrOSJWcoJcBS4ARzQ2F4BZ2LPmTeNuykHwEWgkQGAet9QfiMZjUSt3hwD7psGTWgs9pwH1hC1enMYeA7sKwDxBqjGnvNdZzKZjqmCAKh+U1kmEwi3IEBbIsugnY5avTkEtIAtFhBrQCX2nLVehqyRqFoCAAwBh3WGLAhbgCRIYYinwLolwLqKUwwi9pxV4KUlxKKKUwxC6ZElRCPLYAJxGfhSEOCz6m8HEXvOB2CyIMSk6m8HoXQTmMkJcA2YNTHm3congOvATo3tE3A29pxbpnFzQSiQPcB55IFmFNgFfEQeahaAGZMpsIJIAZWAHcDX2HN+2cT6r39GxmvC9aPNwH5gO1BOPFuBVWAZue0vA9+A12EgjPadnhCuH1WAE8ivYAQ4ohKaagV4gvxi5oG7YSA2vApsCOH60WngKrA3R9IsvQUuhIGY00K4flQG7gHH/mLytB4C42EgfrQb0mV7us8AAMeBS8mGNMR4nwHamtBB7B4QRNdaS0M8GxDEog7iyoAguvJ0QYSBuAOcAt71Kfl7wA8DcTvZ2KtOlJEr+ByyQtqqhTyHTIeB+ONeqi3brh+VgIN0fohUgWGggizZFTplu12yW8iy/YLOGWMpDMTPXnl+Az9vj2HERYqPAAAAAElFTkSuQmCC" type="image/png">
+  <link rel="stylesheet" href="./assets/compiled/css/app.css">
+  <link rel="stylesheet" href="./assets/compiled/css/app-dark.css">
+  <link rel="stylesheet" href="./assets/compiled/css/auth.css">
+  <link rel="stylesheet" href="./assets/extensions/choices.js/public/assets/styles/choices.css">
+  <style>
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    .auth-title {
+        margin-bottom: 1rem;
+    }
+    #registerForm {
+        max-height: 80vh;
+        overflow-y: auto;
+        padding-right: 1rem;
+    }
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 1.5rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eee;
+    }
+    .profile-pic-wrapper {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        margin: 0 auto 20px;
+    }
+    .profile-pic {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .profile-pic-upload {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background: #fff;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .profile-pic-upload input {
+        display: none;
+    }
+    .profile-pic-upload i {
+        color: #666;
+    }
+  </style>
+</head>
+
+<body>
+    <script src="assets/static/js/initTheme.js"></script>
+    <div id="auth">
+<div class="row h-100">
+            <div class="col-lg-7 col-12">
+        <div id="auth-left">
+                    <div class="auth-logo mb-4">
+                <a href="index.html"><img src="./assets/compiled/svg/logo.svg" alt="Logo"></a>
+            </div>
+                    <h1 class="auth-title">Create Your Profile</h1>
+                    <p class="auth-subtitle mb-4">Input your data to register to our career management system.</p>
+
+            <form id="registerForm">
+                        <!-- Profile Picture -->
+                        <div class="section-title">Profile Picture</div>
+                        <div class="profile-pic-wrapper mb-4">
+                            <img src="./assets/compiled/jpg/1.jpg" alt="Profile Picture" id="profilePicPreview" class="profile-pic">
+                            <label class="profile-pic-upload">
+                                <input type="file" accept="image/*" name="profileImage" onchange="previewImage(event)">
+                                <i class="bi bi-camera"></i>
+                            </label>
+                        </div>
+
+                        <!-- Basic Information -->
+                        <div class="section-title">Basic Information</div>
+                <div class="form-group position-relative has-icon-left mb-4">
+                            <input type="text" class="form-control form-control-xl" placeholder="Full Name" name="fullName" required>
+                    <div class="form-control-icon">
+                        <i class="bi bi-person"></i>
+                    </div>
+                </div>
+                <div class="form-group position-relative has-icon-left mb-4">
+                    <input type="email" class="form-control form-control-xl" placeholder="Email" name="email" required>
+                    <div class="form-control-icon">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                </div>
+                        <div class="form-group position-relative has-icon-left mb-4">
+                            <select class="form-control form-control-xl" name="role" required>
+                                <option value="">Select Role</option>
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                            <div class="form-control-icon">
+                                <i class="bi bi-person-badge"></i>
+                            </div>
+                        </div>
+                <div class="form-group position-relative has-icon-left mb-4">
+                    <input type="password" class="form-control form-control-xl" placeholder="Password" name="password" required>
+                    <div class="form-control-icon">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                </div>
+                <div class="form-group position-relative has-icon-left mb-4">
+                    <input type="password" class="form-control form-control-xl" placeholder="Confirm Password" name="confirmPassword" required>
+                    <div class="form-control-icon">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                </div>
+
+                        <!-- Professional Information -->
+                        <div class="section-title">Professional Information</div>
+                        <div class="form-group position-relative has-icon-left mb-4">
+                            <input type="text" class="form-control form-control-xl" placeholder="Job Title" name="jobTitle">
+                            <div class="form-control-icon">
+                                <i class="bi bi-briefcase"></i>
+                            </div>
+                        </div>
+                        <div class="form-group position-relative has-icon-left mb-4">
+                            <input type="tel" class="form-control form-control-xl" placeholder="Phone Number" name="phone">
+                            <div class="form-control-icon">
+                                <i class="bi bi-phone"></i>
+                            </div>
+                        </div>
+                        <div class="form-group position-relative has-icon-left mb-4">
+                            <input type="text" class="form-control form-control-xl" placeholder="Location" name="location">
+                            <div class="form-control-icon">
+                                <i class="bi bi-geo-alt"></i>
+                            </div>
+                        </div>
+                        <div class="form-group mb-4">
+                            <select class="choices form-select" multiple="multiple" name="skills">
+                                <option value="JavaScript">JavaScript</option>
+                                <option value="Python">Python</option>
+                                <option value="Java">Java</option>
+                                <option value="React">React</option>
+                                <option value="Node.js">Node.js</option>
+                                <option value="SQL">SQL</option>
+                                <option value="AWS">AWS</option>
+                                <option value="Docker">Docker</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-4">
+                            <textarea class="form-control" rows="4" placeholder="Professional Summary" name="professionalSummary"></textarea>
+                        </div>
+
+                        <!-- Education -->
+                        <div class="section-title">Education</div>
+                        <div id="educationContainer">
+                            <div class="education-entry mb-3">
+                                <div class="form-group mb-2">
+                                    <input type="text" class="form-control" placeholder="School/University" name="education[0].school">
+                                </div>
+                                <div class="form-group mb-2">
+                                    <input type="text" class="form-control" placeholder="Degree" name="education[0].degree">
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" placeholder="Start Year" name="education[0].startYear">
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" placeholder="End Year" name="education[0].endYear">
+        </div>
+    </div>
+            </div>
+                        <button type="button" class="btn btn-outline-secondary btn-sm mb-4" onclick="addEducation()">
+                            Add Education
+                        </button>
+
+                        <!-- Work Experience -->
+                        <div class="section-title">Work Experience</div>
+                        <div id="experienceContainer">
+                            <div class="experience-entry mb-3">
+                                <div class="form-group mb-2">
+                                    <input type="text" class="form-control" placeholder="Company" name="workExperience[0].company">
+                                </div>
+                                <div class="form-group mb-2">
+                                    <input type="text" class="form-control" placeholder="Job Title" name="workExperience[0].title">
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6">
+                                        <input type="date" class="form-control" placeholder="Start Date" name="workExperience[0].startDate">
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="date" class="form-control" placeholder="End Date" name="workExperience[0].endDate">
+</div>
+    </div>
+                <div class="form-group">
+                    <textarea class="form-control" rows="2" placeholder="Description" name="workExperience[0].description"></textarea>
+                </div>
+            </div>
+        </div>
+                        <button type="button" class="btn btn-outline-secondary btn-sm mb-4" onclick="addExperience()">
+                            Add Experience
+                        </button>
+
+                        <!-- Submit Button -->
+                        <button type="submit" id="registerButton" class="btn btn-primary btn-block btn-lg shadow-lg mt-5">Sign Up</button>
+            </form>
+            <div class="text-center mt-5 text-lg fs-4">
+                        <p class='text-gray-600'>Already have an account? <a href="auth-login.html" class="font-bold">Log in</a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block">
+                <div id="auth-right"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./assets/extensions/choices.js/public/assets/scripts/choices.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/js/api-config.js"></script>
+    <script>
+        // Initialize Choices.js for skills select
+        document.addEventListener('DOMContentLoaded', function() {
+            const choices = new Choices('select[name="skills"]', {
+                removeItemButton: true,
+                maxItemCount: 10,
+                searchEnabled: true,
+                placeholder: true,
+                placeholderValue: 'Select your skills'
+            });
+
+            // Add form submit event listener
+            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+        });
+
+        let educationCount = 1;
+        let experienceCount = 1;
+
+        function addEducation() {
+            const container = document.getElementById('educationContainer');
+            const div = document.createElement('div');
+            div.className = 'education-entry mb-3';
+            div.innerHTML = `
+                <div class="form-group mb-2">
+                    <input type="text" class="form-control" placeholder="School/University" name="education[${educationCount}].school">
+                </div>
+                <div class="form-group mb-2">
+                    <input type="text" class="form-control" placeholder="Degree" name="education[${educationCount}].degree">
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <input type="number" class="form-control" placeholder="Start Year" name="education[${educationCount}].startYear">
+                    </div>
+                    <div class="col-6">
+                        <input type="number" class="form-control" placeholder="End Year" name="education[${educationCount}].endYear">
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+            educationCount++;
+        }
+
+        function addExperience() {
+            const container = document.getElementById('experienceContainer');
+            const div = document.createElement('div');
+            div.className = 'experience-entry mb-3';
+            div.innerHTML = `
+                <div class="form-group mb-2">
+                    <input type="text" class="form-control" placeholder="Company" name="workExperience[${experienceCount}].company">
+                </div>
+                <div class="form-group mb-2">
+                    <input type="text" class="form-control" placeholder="Job Title" name="workExperience[${experienceCount}].title">
+                </div>
+                <div class="row mb-2">
+                    <div class="col-6">
+                        <input type="date" class="form-control" placeholder="Start Date" name="workExperience[${experienceCount}].startDate">
+                    </div>
+                    <div class="col-6">
+                        <input type="date" class="form-control" placeholder="End Date" name="workExperience[${experienceCount}].endDate">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" rows="2" placeholder="Description" name="workExperience[${experienceCount}].description"></textarea>
+                </div>
+            `;
+            container.appendChild(div);
+            experienceCount++;
+        }
+
+        // Preview profile image
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profilePicPreview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Handle form submission
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const submitButton = document.getElementById('registerButton');
+            
+            try {
+                // Set loading state
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Registering...';
+
+                // Get form data
+                const formData = new FormData(form);
+                const userData = {
+                    fullName: formData.get('fullName'),
+                    email: formData.get('email'),
+                    password: formData.get('password'),
+                    confirmPassword: formData.get('confirmPassword'),
+                    role: formData.get('role'),
+                    jobTitle: formData.get('jobTitle'),
+                    phone: formData.get('phone'),
+                    location: formData.get('location'),
+                    skills: formData.getAll('skills'),
+                    professionalSummary: formData.get('professionalSummary')
+                };
+
+                // Validate required fields
+                if (!userData.fullName || !userData.email || !userData.password || !userData.role) {
+                    throw new Error('Please fill in all required fields');
+                }
+
+                // Validate passwords match
+                if (userData.password !== userData.confirmPassword) {
+                    throw new Error('Passwords do not match');
+                }
+
+                // Validate password length
+                if (userData.password.length < 6) {
+                    throw new Error('Password must be at least 6 characters long');
+                }
+
+                // Get education data
+                const educationEntries = form.querySelectorAll('.education-entry');
+                userData.education = Array.from(educationEntries).map(entry => ({
+                    school: entry.querySelector('[name$="school"]').value,
+                    degree: entry.querySelector('[name$="degree"]').value,
+                    startYear: parseInt(entry.querySelector('[name$="startYear"]').value) || null,
+                    endYear: parseInt(entry.querySelector('[name$="endYear"]').value) || null
+                })).filter(edu => edu.school || edu.degree);
+
+                // Get work experience data
+                const experienceEntries = form.querySelectorAll('.experience-entry');
+                userData.workExperience = Array.from(experienceEntries).map(entry => ({
+                    company: entry.querySelector('[name$="company"]').value,
+                    title: entry.querySelector('[name$="title"]').value,
+                    startDate: entry.querySelector('[name$="startDate"]').value || null,
+                    endDate: entry.querySelector('[name$="endDate"]').value || null,
+                    description: entry.querySelector('[name$="description"]').value
+                })).filter(exp => exp.company || exp.title);
+
+                // Handle profile image
+                const profileImageInput = form.querySelector('input[name="profileImage"]');
+                if (profileImageInput.files[0]) {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(profileImageInput.files[0]);
+                    reader.onload = async function() {
+                        userData.profileImage = reader.result;
+                        await submitRegistration(userData);
+                    };
+                } else {
+                    await submitRegistration(userData);
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Registration Failed',
+                    text: error.message || 'An error occurred during registration'
+                });
+            } finally {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Sign Up';
+                }
+            }
+        }
+
+        async function submitRegistration(userData) {
+            try {
+                console.log('Submitting registration data:', userData);
+                
+                // Remove confirmPassword before sending
+                const { confirmPassword, ...registrationData } = userData;
+                
+                // Ensure required fields are present
+                const requiredFields = ['fullName', 'email', 'password', 'role'];
+                for (const field of requiredFields) {
+                    if (!registrationData[field]) {
+                        throw new Error(`${field.charAt(0).toUpperCase() + field.slice(1)} is required`);
+                    }
+                }
+
+                // Validate email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(registrationData.email)) {
+                    throw new Error('Please enter a valid email address');
+                }
+
+                // Clean up empty or null values
+                Object.keys(registrationData).forEach(key => {
+                    if (registrationData[key] === null || registrationData[key] === '') {
+                        delete registrationData[key];
+                    }
+                });
+
+                // Make the API request
+                const response = await makeApiRequest(API_CONFIG.endpoints.register, {
+                    method: 'POST',
+                    body: JSON.stringify(registrationData)
+                });
+
+                console.log('Registration response:', response);
+
+                if (response && response.success) {
+                    // Show success message
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Registration Successful',
+                        text: 'Your account has been created successfully!',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+
+                    // Store token and user data if provided
+                    if (response.token) {
+                        localStorage.setItem('token', response.token);
+                    }
+                    if (response.user) {
+                        localStorage.setItem('user', JSON.stringify(response.user));
+                    }
+
+                    // Redirect to login page
+                    window.location.href = '/auth-login.html';
+                } else {
+                    throw new Error(response.message || 'Registration failed');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                
+                // Show error message to user
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Registration Failed',
+                    text: error.message || 'An unexpected error occurred during registration'
+                });
+                
+                // Re-enable submit button
+                const submitButton = document.getElementById('registerButton');
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Sign Up';
+                }
+                
+                throw error;
+            }
+        }
+    </script>
+</body>
+
+</html>

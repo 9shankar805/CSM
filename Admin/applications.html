@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Review - CSM</title>
+    <link rel="stylesheet" href="assets/compiled/css/app.css">
+    <link rel="stylesheet" href="assets/compiled/css/app-dark.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        .score-card {
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .score-input {
+            width: 60px;
+            text-align: center;
+        }
+        .comment-box {
+            border-left: 3px solid #435ebe;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+        }
+        .private-comment {
+            border-left-color: #dc3545;
+        }
+        .score-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="main" class="layout-horizontal">
+            <header class="mb-3">
+                <div class="d-flex justify-content-between align-items-center px-3">
+                    <a href="#" class="burger-btn d-block d-xl-none">
+                        <i class="bi bi-justify fs-3"></i>
+                    </a>
+                    <div class="dropdown">
+                        <a href="#" id="topbarUserDropdown" class="user-dropdown d-flex align-items-center dropend dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="avatar avatar-md2">
+                                <img src="assets/compiled/jpg/1.jpg" alt="Avatar" id="userAvatar">
+                            </div>
+                            <div class="text">
+                                <h6 class="user-dropdown-name" id="userName">Loading...</h6>
+                                <p class="user-dropdown-status text-sm text-muted" id="userRole">Loading...</p>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="topbarUserDropdown">
+                            <li><a class="dropdown-item" href="profile.html">My Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="handleLogout()">Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper container">
+                <div class="page-heading">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Application Review</h3>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="dashboard.html">Dashboard</a></li>
+                                    <li class="breadcrumb-item active">Application Review</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page-content">
+                    <div class="row">
+                        <!-- Application List -->
+                        <div class="col-12 col-xl-4 col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4>Applications</h4>
+                                    <div class="card-header-action">
+                                        <div class="dropdown">
+                                            <button class="btn btn-primary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Filter
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                                                <li><a class="dropdown-item" href="#" onclick="filterApplications('all')">All</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="filterApplications('pending')">Pending</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="filterApplications('shortlisted')">Shortlisted</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="filterApplications('rejected')">Rejected</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group" id="applicationList">
+                                        <!-- Applications will be dynamically added here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Application Details and Review Form -->
+                        <div class="col-12 col-xl-8 col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 id="applicantName">Select an Application</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div id="applicationDetails" style="display: none;">
+                                        <!-- Applicant Information -->
+                                        <div class="row mb-4">
+                                            <div class="col-12 col-md-6">
+                                                <h6>Personal Information</h6>
+                                                <p><strong>Email:</strong> <span id="applicantEmail"></span></p>
+                                                <p><strong>Phone:</strong> <span id="applicantPhone"></span></p>
+                                                <p><strong>Position:</strong> <span id="appliedPosition"></span></p>
+                                            </div>
+                                            <div class="col-12 col-md-6">
+                                                <h6>Application Status</h6>
+                                                <p><strong>Status:</strong> <span id="applicationStatus" class="status-badge"></span></p>
+                                                <p><strong>Applied Date:</strong> <span id="appliedDate"></span></p>
+                                                <p><strong>Last Updated:</strong> <span id="lastUpdated"></span></p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Review Form -->
+                                        <form id="reviewForm" onsubmit="submitReview(event)">
+                                            <input type="hidden" id="applicationId">
+                                            
+                                            <!-- Scoring Section -->
+                                            <div class="row mb-4">
+                                                <h6>Evaluation Scores</h6>
+                                                <div class="col-md-3 col-6">
+                                                    <div class="score-card bg-light">
+                                                        <div class="score-label">Technical</div>
+                                                        <input type="number" class="form-control score-input" id="technicalScore" min="0" max="10" required>
+                                                        <small class="text-muted">/10</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <div class="score-card bg-light">
+                                                        <div class="score-label">Experience</div>
+                                                        <input type="number" class="form-control score-input" id="experienceScore" min="0" max="10" required>
+                                                        <small class="text-muted">/10</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <div class="score-card bg-light">
+                                                        <div class="score-label">Communication</div>
+                                                        <input type="number" class="form-control score-input" id="communicationScore" min="0" max="10" required>
+                                                        <small class="text-muted">/10</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <div class="score-card bg-light">
+                                                        <div class="score-label">Culture Fit</div>
+                                                        <input type="number" class="form-control score-input" id="cultureFitScore" min="0" max="10" required>
+                                                        <small class="text-muted">/10</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Feedback Section -->
+                                            <div class="row mb-4">
+                                                <div class="col-12">
+                                                    <h6>Detailed Feedback</h6>
+                                                    <div class="form-group mb-3">
+                                                        <label>Strengths</label>
+                                                        <textarea class="form-control" id="strengths" rows="2" required></textarea>
+                                                    </div>
+                                                    <div class="form-group mb-3">
+                                                        <label>Areas for Improvement</label>
+                                                        <textarea class="form-control" id="weaknesses" rows="2" required></textarea>
+                                                    </div>
+                                                    <div class="form-group mb-3">
+                                                        <label>Recommendations</label>
+                                                        <textarea class="form-control" id="recommendations" rows="2" required></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Decision Section -->
+                                            <div class="row mb-4">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Application Status</label>
+                                                        <select class="form-select" id="reviewStatus" required>
+                                                            <option value="pending">Pending</option>
+                                                            <option value="shortlisted">Shortlist</option>
+                                                            <option value="rejected">Reject</option>
+                                                            <option value="on_hold">Hold</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Next Steps</label>
+                                                        <select class="form-select" id="nextSteps" required>
+                                                            <option value="schedule_interview">Schedule Interview</option>
+                                                            <option value="request_more_info">Request More Information</option>
+                                                            <option value="send_offer">Send Offer</option>
+                                                            <option value="reject">Reject Application</option>
+                                                            <option value="hold">Hold Application</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Comments Section -->
+                                            <div class="row mb-4">
+                                                <div class="col-12">
+                                                    <h6>Comments</h6>
+                                                    <div class="form-group mb-3">
+                                                        <textarea class="form-control" id="commentText" rows="2" placeholder="Add a comment..."></textarea>
+                                                        <div class="form-check mt-2">
+                                                            <input class="form-check-input" type="checkbox" id="privateComment">
+                                                            <label class="form-check-label" for="privateComment">
+                                                                Private Comment
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <button type="button" class="btn btn-secondary btn-sm" onclick="addComment()">Add Comment</button>
+                                                </div>
+                                                <div class="col-12 mt-3">
+                                                    <div id="commentsList">
+                                                        <!-- Comments will be dynamically added here -->
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                                                    <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/static/js/components/dark.js"></script>
+    <script src="assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="assets/compiled/js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        let currentApplication = null;
+
+        // Check authentication
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const role = localStorage.getItem('userRole');
+            
+            if (!token || role !== 'admin') {
+                window.location.href = 'user/login.html';
+                return null;
+            }
+            return token;
+        }
+
+        // Load applications
+        async function loadApplications(filter = 'all') {
+            const token = checkAuth();
+            if (!token) return;
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/admin/applications?filter=${filter}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const applications = await response.json();
+                    displayApplications(applications);
+                }
+            } catch (error) {
+                console.error('Error loading applications:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load applications'
+                });
+            }
+        }
+
+        // Display applications in the list
+        function displayApplications(applications) {
+            const list = document.getElementById('applicationList');
+            list.innerHTML = applications.map(app => `
+                <a href="#" class="list-group-item list-group-item-action" onclick="loadApplicationDetails('${app._id}')">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">${app.user.fullName}</h6>
+                        <small class="text-muted">${new Date(app.createdAt).toLocaleDateString()}</small>
+                    </div>
+                    <p class="mb-1">${app.position}</p>
+                    <small class="text-muted">Status: ${app.status}</small>
+                </a>
+            `).join('');
+        }
+
+        // Load application details
+        async function loadApplicationDetails(id) {
+            const token = checkAuth();
+            if (!token) return;
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/admin/applications/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const application = await response.json();
+                    currentApplication = application;
+                    displayApplicationDetails(application);
+                }
+            } catch (error) {
+                console.error('Error loading application details:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load application details'
+                });
+            }
+        }
+
+        // Display application details
+        function displayApplicationDetails(application) {
+            document.getElementById('applicationDetails').style.display = 'block';
+            document.getElementById('applicationId').value = application._id;
+            document.getElementById('applicantName').textContent = application.user.fullName;
+            document.getElementById('applicantEmail').textContent = application.user.email;
+            document.getElementById('applicantPhone').textContent = application.user.phone;
+            document.getElementById('appliedPosition').textContent = application.position;
+            document.getElementById('applicationStatus').textContent = application.status;
+            document.getElementById('appliedDate').textContent = new Date(application.createdAt).toLocaleDateString();
+            document.getElementById('lastUpdated').textContent = new Date(application.updatedAt).toLocaleDateString();
+
+            // Load existing review if available
+            if (application.review) {
+                document.getElementById('technicalScore').value = application.review.technicalScore;
+                document.getElementById('experienceScore').value = application.review.experienceScore;
+                document.getElementById('communicationScore').value = application.review.communicationScore;
+                document.getElementById('cultureFitScore').value = application.review.cultureFitScore;
+                document.getElementById('strengths').value = application.review.feedback.strengths.join('\n');
+                document.getElementById('weaknesses').value = application.review.feedback.weaknesses.join('\n');
+                document.getElementById('recommendations').value = application.review.feedback.recommendations;
+                document.getElementById('reviewStatus').value = application.review.status;
+                document.getElementById('nextSteps').value = application.review.nextSteps;
+
+                displayComments(application.review.comments);
+            }
+        }
+
+        // Display comments
+        function displayComments(comments) {
+            const container = document.getElementById('commentsList');
+            container.innerHTML = comments.map(comment => `
+                <div class="comment-box ${comment.isPrivate ? 'private-comment' : ''}">
+                    <div class="d-flex justify-content-between">
+                        <strong>${comment.author.fullName}</strong>
+                        <small class="text-muted">${new Date(comment.timestamp).toLocaleString()}</small>
+                    </div>
+                    <p class="mb-0">${comment.text}</p>
+                    ${comment.isPrivate ? '<small class="text-danger">Private Comment</small>' : ''}
+                </div>
+            `).join('');
+        }
+
+        // Add comment
+        async function addComment() {
+            const token = checkAuth();
+            if (!token) return;
+
+            const commentText = document.getElementById('commentText').value.trim();
+            const isPrivate = document.getElementById('privateComment').checked;
+
+            if (!commentText) return;
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/admin/applications/${currentApplication._id}/comments`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: commentText,
+                        isPrivate
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    document.getElementById('commentText').value = '';
+                    document.getElementById('privateComment').checked = false;
+                    loadApplicationDetails(currentApplication._id);
+                }
+            } catch (error) {
+                console.error('Error adding comment:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to add comment'
+                });
+            }
+        }
+
+        // Submit review
+        async function submitReview(event) {
+            event.preventDefault();
+            const token = checkAuth();
+            if (!token) return;
+
+            const formData = {
+                applicationId: document.getElementById('applicationId').value,
+                technicalScore: parseInt(document.getElementById('technicalScore').value),
+                experienceScore: parseInt(document.getElementById('experienceScore').value),
+                communicationScore: parseInt(document.getElementById('communicationScore').value),
+                cultureFitScore: parseInt(document.getElementById('cultureFitScore').value),
+                status: document.getElementById('reviewStatus').value,
+                nextSteps: document.getElementById('nextSteps').value,
+                feedback: {
+                    strengths: document.getElementById('strengths').value.split('\n').filter(s => s.trim()),
+                    weaknesses: document.getElementById('weaknesses').value.split('\n').filter(s => s.trim()),
+                    recommendations: document.getElementById('recommendations').value
+                }
+            };
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/admin/applications/${formData.applicationId}/review`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Review submitted successfully'
+                    });
+                    loadApplications();
+                    loadApplicationDetails(formData.applicationId);
+                }
+            } catch (error) {
+                console.error('Error submitting review:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to submit review'
+                });
+            }
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('reviewForm').reset();
+            if (currentApplication) {
+                loadApplicationDetails(currentApplication._id);
+            }
+        }
+
+        // Filter applications
+        function filterApplications(filter) {
+            loadApplications(filter);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadApplications();
+        });
+    </script>
+</body>
+</html>

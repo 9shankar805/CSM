@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role Management - CSM Admin Dashboard</title>
+    
+    <link rel="shortcut icon" href="./assets/compiled/svg/favicon.svg" type="image/x-icon">
+    <link rel="stylesheet" href="./assets/compiled/css/app.css">
+    <link rel="stylesheet" href="./assets/compiled/css/app-dark.css">
+    <style>
+        .role-card {
+            transition: transform 0.3s;
+        }
+        .role-card:hover {
+            transform: translateY(-5px);
+        }
+        .permission-badge {
+            font-size: 0.8rem;
+            margin: 2px;
+        }
+        .team-member-card {
+            border-left: 4px solid transparent;
+            transition: all 0.3s;
+        }
+        .team-member-card:hover {
+            border-left-color: #435ebe;
+            background: #f8f9fa;
+        }
+        .skill-badge {
+            font-size: 0.75rem;
+            padding: 5px 10px;
+            margin: 2px;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="assets/static/js/initTheme.js"></script>
+    <div id="app">
+        <div id="sidebar">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header position-relative">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="logo">
+                            <a href="index.html"><img src="./assets/compiled/svg/logo.svg" alt="Logo" srcset=""></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-item">
+                            <a href="index.html" class='sidebar-link'>
+                                <i class="bi bi-grid-fill"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item active">
+                            <a href="add_roles.html" class='sidebar-link'>
+                                <i class="bi bi-person-badge-fill"></i>
+                                <span>Role Management</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+            
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Role Management</h3>
+                            <p class="text-subtitle text-muted">Define and manage team roles and permissions</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <div class="header-top-right" style="margin:0 0 30px 30px;">
+                                    <div class="dropdown">
+                                        <a href="#" id="topbarUserDropdown" class="user-dropdown d-flex align-items-center dropend dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <div class="avatar avatar-md2">
+                                                <img src="assets/compiled/jpg/1.jpg" alt="Avatar" id="userAvatar">
+                                            </div>
+                                            <div class="text">
+                                                <h6 class="user-dropdown-name" id="userName">Loading...</h6>
+                                                <p class="user-dropdown-status text-sm text-muted" id="userRole">Loading...</p>
+                                            </div>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="topbarUserDropdown">
+                                            <li><a class="dropdown-item" href="profile.html">My Profile</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" href="#" onclick="handleLogout()">Logout</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <ol class="breadcrumb">
+                                    
+                                    <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+                                    <li class="breadcrumb-item active">Role Management</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="section">
+                    <div class="row">
+                        <!-- Role Management Section -->
+                        <div class="col-12 col-lg-4">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h4>Available Roles</h4>
+                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRoleModal">
+                                        <i class="bi bi-plus"></i> Add Role
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Content Strategist -->
+                                    <div class="role-card p-3 border rounded mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="text-primary mb-0">Content Strategist</h6>
+                                            <div>
+                                                <button class="btn btn-sm btn-light" onclick="editRole('strategist')">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <p class="text-muted mb-2">Plans and oversees content creation and distribution</p>
+                                        <div>
+                                            <span class="badge bg-primary permission-badge">Create Content Plan</span>
+                                            <span class="badge bg-primary permission-badge">Approve Content</span>
+                                            <span class="badge bg-primary permission-badge">Analytics Access</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Writer -->
+                                    <div class="role-card p-3 border rounded mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="text-success mb-0">Writer</h6>
+                                            <div>
+                                                <button class="btn btn-sm btn-light" onclick="editRole('writer')">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <p class="text-muted mb-2">Creates and edits content according to guidelines</p>
+                                        <div>
+                                            <span class="badge bg-success permission-badge">Create Content</span>
+                                            <span class="badge bg-success permission-badge">Edit Own Content</span>
+                                            <span class="badge bg-success permission-badge">Submit for Review</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Editor -->
+                                    <div class="role-card p-3 border rounded mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="text-info mb-0">Editor</h6>
+                                            <div>
+                                                <button class="btn btn-sm btn-light" onclick="editRole('editor')">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <p class="text-muted mb-2">Reviews and refines content before publication</p>
+                                        <div>
+                                            <span class="badge bg-info permission-badge">Review Content</span>
+                                            <span class="badge bg-info permission-badge">Edit All Content</span>
+                                            <span class="badge bg-info permission-badge">Publish Content</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Designer -->
+                                    <div class="role-card p-3 border rounded mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="text-warning mb-0">Designer</h6>
+                                            <div>
+                                                <button class="btn btn-sm btn-light" onclick="editRole('designer')">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <p class="text-muted mb-2">Creates visual elements and maintains brand consistency</p>
+                                        <div>
+                                            <span class="badge bg-warning permission-badge">Create Designs</span>
+                                            <span class="badge bg-warning permission-badge">Asset Library Access</span>
+                                            <span class="badge bg-warning permission-badge">Brand Guidelines</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Team Members Section -->
+                        <div class="col-12 col-lg-8">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h4>Team Members</h4>
+                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+                                        <i class="bi bi-person-plus"></i> Add Member
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Project Manager -->
+                                    <div class="team-member-card p-3 border rounded mb-3">
+                                        <div class="row align-items-center">
+                                            <div class="col-auto">
+                                                <div class="avatar avatar-md">
+                                                    <img src="./assets/compiled/jpg/1.jpg" alt="face">
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <h6 class="mb-0">John Doe</h6>
+                                                <p class="text-muted mb-2">Project Manager</p>
+                                                <div class="mb-2">
+                                                    <span class="badge bg-primary skill-badge">Leadership</span>
+                                                    <span class="badge bg-primary skill-badge">Agile</span>
+                                                    <span class="badge bg-primary skill-badge">Risk Management</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <button class="btn btn-light btn-sm">
+                                                    <i class="bi bi-three-dots-vertical"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Developer -->
+                                    <div class="team-member-card p-3 border rounded mb-3">
+                                        <div class="row align-items-center">
+                                            <div class="col-auto">
+                                                <div class="avatar avatar-md">
+                                                    <img src="./assets/compiled/jpg/2.jpg" alt="face">
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <h6 class="mb-0">Sarah Smith</h6>
+                                                <p class="text-muted mb-2">Senior Developer</p>
+                                                <div class="mb-2">
+                                                    <span class="badge bg-info skill-badge">React</span>
+                                                    <span class="badge bg-info skill-badge">Node.js</span>
+                                                    <span class="badge bg-info skill-badge">MongoDB</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <button class="btn btn-light btn-sm">
+                                                    <i class="bi bi-three-dots-vertical"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Content Strategist -->
+                                    <div class="team-member-card p-3 border rounded mb-3">
+                                        <div class="row align-items-center">
+                                            <div class="col-auto">
+                                                <div class="avatar avatar-md">
+                                                    <img src="./assets/compiled/jpg/3.jpg" alt="face">
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <h6 class="mb-0">Mike Johnson</h6>
+                                                <p class="text-muted mb-2">Content Strategist</p>
+                                                <div class="mb-2">
+                                                    <span class="badge bg-success skill-badge">SEO</span>
+                                                    <span class="badge bg-success skill-badge">Content Planning</span>
+                                                    <span class="badge bg-success skill-badge">Analytics</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <button class="btn btn-light btn-sm">
+                                                    <i class="bi bi-three-dots-vertical"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Role Statistics -->
+                            <div class="row">
+                                <div class="col-6 col-lg-3">
+                                    <div class="card">
+                                        <div class="card-body px-4 py-4-5">
+                                            <div class="row">
+                                                <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
+                                                    <div class="stats-icon purple mb-2">
+                                                        <i class="bi bi-people-fill"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
+                                                    <h6 class="text-muted font-semibold">Total Members</h6>
+                                                    <h6 class="font-extrabold mb-0">12</h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-lg-3">
+                                    <div class="card">
+                                        <div class="card-body px-4 py-4-5">
+                                            <div class="row">
+                                                <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
+                                                    <div class="stats-icon blue mb-2">
+                                                        <i class="bi bi-person-badge-fill"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
+                                                    <h6 class="text-muted font-semibold">Active Roles</h6>
+                                                    <h6 class="font-extrabold mb-0">7</h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-lg-3">
+                                    <div class="card">
+                                        <div class="card-body px-4 py-4-5">
+                                            <div class="row">
+                                                <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
+                                                    <div class="stats-icon green mb-2">
+                                                        <i class="bi bi-person-check-fill"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
+                                                    <h6 class="text-muted font-semibold">Active Projects</h6>
+                                                    <h6 class="font-extrabold mb-0">4</h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-lg-3">
+                                    <div class="card">
+                                        <div class="card-body px-4 py-4-5">
+                                            <div class="row">
+                                                <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
+                                                    <div class="stats-icon red mb-2">
+                                                        <i class="bi bi-person-plus-fill"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
+                                                    <h6 class="text-muted font-semibold">Open Positions</h6>
+                                                    <h6 class="font-extrabold mb-0">3</h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Role Modal -->
+    <div class="modal fade" id="addRoleModal" tabindex="-1" aria-labelledby="addRoleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addRoleModalLabel">Add New Role</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addRoleForm">
+                        <div class="mb-3">
+                            <label for="roleName" class="form-label">Role Name</label>
+                            <input type="text" class="form-control" id="roleName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="roleDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="roleDescription" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Permissions</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="createContent">
+                                <label class="form-check-label" for="createContent">Create Content</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editContent">
+                                <label class="form-check-label" for="editContent">Edit Content</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="deleteContent">
+                                <label class="form-check-label" for="deleteContent">Delete Content</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="manageUsers">
+                                <label class="form-check-label" for="manageUsers">Manage Users</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="saveRole()">Save Role</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div class="modal fade" id="addMemberModal" tabindex="-1" aria-labelledby="addMemberModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addMemberModalLabel">Add New Team Member</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addMemberForm">
+                        <div class="mb-3">
+                            <label for="memberName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="memberName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="memberEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="memberEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="memberRole" class="form-label">Role</label>
+                            <select class="form-select" id="memberRole" required>
+                                <option value="">Select Role</option>
+                                <option value="project_manager">Project Manager</option>
+                                <option value="developer">Developer</option>
+                                <option value="designer">Designer</option>
+                                <option value="content_strategist">Content Strategist</option>
+                                <option value="writer">Writer</option>
+                                <option value="editor">Editor</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="memberSkills" class="form-label">Skills (comma-separated)</label>
+                            <input type="text" class="form-control" id="memberSkills" placeholder="e.g., JavaScript, React, UI Design">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="saveMember()">Add Member</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/static/js/components/dark.js"></script>
+    <script src="assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="assets/compiled/js/app.js"></script>
+    <script src="assets/js/user-profile.js"></script>
+    
+    <script>
+        function editRole(roleId) {
+            // Implement role editing logic
+            console.log('Editing role:', roleId);
+        }
+
+        function saveRole() {
+            // Get form values
+            const name = document.getElementById('roleName').value;
+            const description = document.getElementById('roleDescription').value;
+            const permissions = {
+                createContent: document.getElementById('createContent').checked,
+                editContent: document.getElementById('editContent').checked,
+                deleteContent: document.getElementById('deleteContent').checked,
+                manageUsers: document.getElementById('manageUsers').checked
+            };
+
+            // Here you would typically save to your backend
+            console.log('Saving role:', { name, description, permissions });
+            $('#addRoleModal').modal('hide');
+        }
+
+        function saveMember() {
+            // Get form values
+            const name = document.getElementById('memberName').value;
+            const email = document.getElementById('memberEmail').value;
+            const role = document.getElementById('memberRole').value;
+            const skills = document.getElementById('memberSkills').value.split(',').map(s => s.trim());
+
+            // Here you would typically save to your backend
+            console.log('Saving member:', { name, email, role, skills });
+            $('#addMemberModal').modal('hide');
+        }
+    </script>
+</body>
+</html>

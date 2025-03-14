@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Discussion - CSM Admin Dashboard</title>
+    
+    <link rel="shortcut icon" href="./assets/compiled/svg/favicon.svg" type="image/x-icon">
+    <link rel="stylesheet" href="./assets/compiled/css/app.css">
+    <link rel="stylesheet" href="./assets/compiled/css/app-dark.css">
+    <style>
+        
+    /* Chat Container */
+    .chat-container {
+        height: 400px;
+        overflow-y: auto;
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+
+    /* Message Styling */
+    .message {
+        margin-bottom: 1rem;
+        max-width: 80%;
+    }
+    .message-sent {
+        margin-left: auto;
+    }
+    .message-received {
+        margin-right: auto;
+    }
+    .message-content {
+        padding: 0.75rem;
+        border-radius: 15px;
+        position: relative;
+    }
+    .message-sent .message-content {
+        background-color: #435ebe;
+        color: white;
+        border-top-right-radius: 5px;
+    }
+    .message-received .message-content {
+        background-color: #f0f1f5;
+        border-top-left-radius: 5px;
+    }
+    .message-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    .message-sent .message-header {
+        justify-content: flex-end;
+    }
+    .message-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .message-sent .message-header .message-avatar {
+        order: 2;
+        margin-left: 8px;
+    }
+    .message-received .message-header .message-avatar {
+        margin-right: 8px;
+    }
+    .message-meta {
+        font-size: 0.875rem;
+    }
+    .message-sent .message-meta {
+        color: #fff;
+    }
+    .message-received .message-meta {
+        color: #6c757d;
+    }
+    .message p {
+        margin: 0;
+        word-wrap: break-word;
+    }
+    .message-timestamp {
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+        opacity: 0.8;
+    }
+
+    /* Input Group */
+    .input-group {
+        margin-top: 10px;
+    }
+
+    /* Scrollbar Styling */
+    .chat-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .chat-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .chat-container::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .chat-container::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    .video-container {
+        position: relative;
+        width: 100%;
+        height: 500px; /* Fixed height for the video container */
+        background-color: #000; /* Black background for video */
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    /* Jitsi Container */
+    #jaas-container {
+        width: 100%;
+        height: 80vh;
+    }
+
+    /* Video Controls */
+    .video-controls {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 8px;
+        border-radius: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .video-controls .btn {
+        padding: 5px 10px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .video-container {
+            height: 300px; /* Smaller height for mobile devices */
+        }
+    }
+        .discussion-item {
+            transition: transform 0.2s;
+        }
+        .discussion-item:hover {
+            transform: translateX(5px);
+        }
+        .online-indicator {
+            width: 10px;
+            height: 10px;
+            background: #00b74a;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+</head>
+
+<body>
+    <script src="assets/static/js/initTheme.js"></script>
+    <div id="app">
+        <div id="sidebar">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header position-relative">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="logo">
+                            <a href="index.html"><img src="./assets/compiled/svg/logo.svg" alt="Logo" srcset=""></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-item">
+                            <a href="index.html" class='sidebar-link'>
+                                <i class="bi bi-grid-fill"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item active">
+                            <a href="Panel_Discussion.html" class='sidebar-link'>
+                                <i class="bi bi-chat-dots-fill"></i>
+                                <span>Panel Discussion</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+            
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="header-top-right" style="margin:0 0 30px 30px;">
+                                    <div class="dropdown">
+                                        <a href="#" id="topbarUserDropdown" class="user-dropdown d-flex align-items-center dropend dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <div class="avatar avatar-md2">
+                                                <img src="assets/compiled/jpg/1.jpg" alt="Avatar" id="userAvatar">
+                                            </div>
+                                            <div class="text">
+                                                <h6 class="user-dropdown-name" id="userName">Loading...</h6>
+                                                <p class="user-dropdown-status text-sm text-muted" id="userRole">Loading...</p>
+                                            </div>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="topbarUserDropdown">
+                                            <li><a class="dropdown-item" href="profile.html">My Profile</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" href="#" onclick="handleLogout()">Logout</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Panel Discussion</h3>
+                            <p class="text-subtitle text-muted">Join discussions and video meetings</p>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="section">
+                    <div class="row">
+                        <!-- Video Call Section -->
+                        <div class="col-12 mb-4">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h4>Active Meeting</h4>
+                                    <div>
+                                        <button class="btn btn-success me-2" onclick="startJitsiCall()">
+                                            <i class="bi bi-camera-video-fill"></i> Join Meeting
+                                        </button>
+                                        
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="video-container">
+                                        <div class="video-grid">
+                                            <div class="video-item">
+                                                <div id="jaas-container"></div> <!-- Jitsi container -->
+                                               
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Section -->
+<div class="col-md-8">
+    <div class="card">
+        <div class="card-header">
+            <h4>Live Discussion</h4>
+        </div>
+        <div class="card-body">
+            <!-- Chat Container -->
+            <div class="chat-container" id="chatContainer">
+                <!-- Example Messages -->
+                <div class="message message-received">
+                                            <div class="message-header">
+                                                <img src="https://via.placeholder.com/32" class="message-avatar" alt="John Doe">
+                                                <span class="message-meta">John Doe</span>
+                                            </div>
+                    <div class="message-content">
+                        <p>Hello everyone! Shall we start the discussion about the new project timeline?</p>
+                                                <div class="message-timestamp">10:30 AM</div>
+                    </div>
+                </div>
+                <div class="message message-sent">
+                                            <div class="message-header">
+                                                <span class="message-meta">You</span>
+                                                <img src="https://via.placeholder.com/32" class="message-avatar" alt="You">
+                                            </div>
+                    <div class="message-content">
+                        <p>Yes, I've prepared the presentation for today's meeting.</p>
+                                                <div class="message-timestamp">10:31 AM</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="mt-3">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="chat-input" placeholder="Type your message...">
+                    <button class="btn btn-primary" id="send-btn">
+                        <i class="bi bi-send"></i> Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+                        <!-- Active Participants -->
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4>Active Participants</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="participants-list">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Active Discussions -->
+                            <div class="card mt-4">
+                                <div class="card-header">
+                                    <h4>Active Discussions</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="discussion-item p-3 border rounded mb-3">
+                                        <h6 class="text-primary">Project Timeline Review</h6>
+                                        <p class="mb-1">Discussing Q2 milestones and deliverables</p>
+                                        <small class="text-muted">5 participants • In Progress</small>
+                                    </div>
+                                    <div class="discussion-item p-3 border rounded mb-3">
+                                        <h6 class="text-success">Tech Stack Discussion</h6>
+                                        <p class="mb-1">Evaluating new technologies for upcoming projects</p>
+                                        <small class="text-muted">3 participants • Starting in 10min</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/static/js/components/dark.js"></script>
+    <script src="assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="assets/compiled/js/app.js"></script>
+    <script src="assets/js/user-profile.js"></script>
+  
+     <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMfK4X5GGUgwArfvYDmls2MAXNySu_Axw",
+            authDomain: "mrpr0c0d.firebaseapp.com",
+            databaseURL: "https://mrpr0c0d-default-rtdb.firebaseio.com",
+            projectId: "mrpr0c0d",
+            storageBucket: "mrpr0c0d.firebasestorage.app",
+            messagingSenderId: "172380062381",
+            appId: "1:172380062381:web:2f6aecbdbe01ed1cab7c24",
+            measurementId: "G-M5ZBW3HRDV"
+        };
+    
+        // Initialize Firebase with error handling
+        let db;
+        try {
+        firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+        } catch (error) {
+            console.error('Error initializing Firebase:', error);
+            alert('Failed to connect to chat server. Please refresh the page or try again later.');
+        }
+
+        // Firebase references with error checks
+        const participantsRef = db?.ref('participants');
+        const connectedRef = db?.ref('.info/connected');
+        let currentUserRef = null;
+
+        if (!participantsRef || !connectedRef) {
+            console.error('Firebase references not initialized properly');
+            const participantsList = document.querySelector('.participants-list');
+            if (participantsList) {
+                participantsList.innerHTML = '<p class="text-danger">Chat service unavailable. Please refresh the page.</p>';
+            }
+            const chatContainer = document.getElementById('chatContainer');
+            if (chatContainer) {
+                chatContainer.innerHTML = '<p class="text-danger text-center mt-3">Chat service unavailable. Please refresh the page.</p>';
+            }
+        }
+
+        // Monitor connection state
+        if (connectedRef) {
+            connectedRef.on('value', (snap) => {
+                if (snap.val() === false) {
+                    console.warn('Lost connection to Firebase');
+                    const statusElement = document.createElement('div');
+                    statusElement.className = 'alert alert-warning text-center';
+                    statusElement.innerHTML = 'Connection lost. Attempting to reconnect...';
+                    document.querySelector('.card-body').prepend(statusElement);
+                    
+                    // Remove the alert when connection is restored
+                    setTimeout(() => {
+                        if (statusElement.parentNode) {
+                            statusElement.parentNode.removeChild(statusElement);
+                        }
+                    }, 3000);
+                }
+            });
+        }
+
+        // Get user profile info from dropdown as fallback
+        function getUserProfileFromDropdown() {
+            try {
+                // Get user info elements
+                const nameElement = document.getElementById('userName');
+                const roleElement = document.getElementById('userRole');
+                const avatarElement = document.getElementById('userAvatar');
+                
+                // Check if elements exist
+                if (!nameElement || !roleElement) {
+                    console.warn('Profile elements not found in dropdown');
+                    return {
+                        fullName: 'Guest User',
+                        role: 'Participant',
+                        profileImage: './assets/compiled/jpg/1.jpg'
+                    };
+                }
+
+                // Get user info with fallbacks
+                const fullName = nameElement.textContent?.trim() || 'Guest User';
+                const role = roleElement.textContent?.trim() || 'Participant';
+                const profileImage = avatarElement?.src || './assets/compiled/jpg/1.jpg';
+
+                // Store in session storage for consistency
+                sessionStorage.setItem('userProfile', JSON.stringify({ fullName, role, profileImage }));
+
+                return { fullName, role, profileImage };
+            } catch (error) {
+                console.error('Error getting profile from dropdown:', error);
+                // Try to get from session storage first
+                const savedProfile = sessionStorage.getItem('userProfile');
+                if (savedProfile) {
+                    try {
+                        return JSON.parse(savedProfile);
+                    } catch (e) {
+                        console.error('Error parsing saved profile:', e);
+                    }
+                }
+                // Return default profile if all else fails
+                return {
+                    fullName: 'Guest User',
+                    role: 'Participant',
+                    profileImage: './assets/compiled/jpg/1.jpg'
+                };
+            }
+        }
+
+        // Generate a unique session ID for the user
+        const sessionId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+
+        // Wait for profile to load before initializing presence
+        async function getUserProfile() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    return getUserProfileFromDropdown();
+                }
+
+                const response = await fetch('/api/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to load profile: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const profile = {
+                    fullName: data.fullName,
+                    role: data.role,
+                    profileImage: data.profileImage || './assets/compiled/jpg/1.jpg'
+                };
+
+                // Store in session storage for consistency
+                sessionStorage.setItem('userProfile', JSON.stringify(profile));
+                return profile;
+            } catch (error) {
+                console.warn('Error loading profile from API, using dropdown data:', error);
+                return getUserProfileFromDropdown();
+            }
+        }
+
+        // Initialize presence with user profile
+        async function initializePresence() {
+            const user = await getUserProfile();
+            if (!user?.fullName) {
+                console.error('Could not initialize presence: No user profile available');
+                return;
+            }
+
+            const userInfo = {
+                name: user.fullName,
+                role: user.role,
+                avatar: user.profileImage,
+                isOnline: true,
+                lastSeen: firebase.database.ServerValue.TIMESTAMP,
+                sessionId: sessionId // Add session ID to track unique instances
+            };
+
+            if (connectedRef) {
+                connectedRef.on('value', (snap) => {
+                    if (snap.val() === true) {
+                        // Remove any existing presence for this user's other sessions
+                        participantsRef.orderByChild('name').equalTo(user.fullName).once('value', snapshot => {
+                            snapshot.forEach(childSnapshot => {
+                                const participant = childSnapshot.val();
+                                if (participant.sessionId !== sessionId) {
+                                    childSnapshot.ref.remove();
+                                }
+                            });
+                        });
+
+                        // Add user to participants
+                        currentUserRef = participantsRef.push(userInfo);
+
+                        // Remove on disconnect
+                        currentUserRef.onDisconnect().remove();
+
+                        // Update status periodically
+                        setInterval(() => {
+                            if (currentUserRef) {
+                                currentUserRef.update({
+                                    isOnline: true,
+                                    lastSeen: firebase.database.ServerValue.TIMESTAMP
+                                });
+                            }
+                        }, 30000);
+
+                        // Handle tab visibility
+                        document.addEventListener('visibilitychange', () => {
+                            if (currentUserRef) {
+                                currentUserRef.update({
+                                    isOnline: !document.hidden,
+                                    lastSeen: firebase.database.ServerValue.TIMESTAMP
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        // Update participants list
+        participantsRef.on('value', async (snapshot) => {
+            try {
+                const currentUser = await getUserProfile();
+                const participantsList = document.querySelector('.participants-list');
+                participantsList.innerHTML = '';
+                
+                if (!snapshot.exists()) {
+                    participantsList.innerHTML = '<p class="text-muted">No active participants</p>';
+                    return;
+                }
+                
+                snapshot.forEach((childSnapshot) => {
+                    const participant = childSnapshot.val();
+                    // Add fallbacks for missing data
+                    const participantData = {
+                        name: participant.name || 'Anonymous User',
+                        role: participant.role || 'Participant',
+                        avatar: participant.avatar || './assets/compiled/jpg/1.jpg',
+                        isOnline: !!participant.isOnline,
+                        lastSeen: participant.lastSeen || Date.now()
+                    };
+                    
+                    const isCurrentUser = currentUser && participantData.name === currentUser.fullName;
+                    
+                    participantsList.innerHTML += `
+                        <div class="d-flex align-items-center mb-3 participant-item ${isCurrentUser ? 'bg-light' : ''}" 
+                             style="border-radius: 8px; padding: 10px;">
+                            <div class="avatar avatar-md me-3 position-relative">
+                                <img src="${participantData.avatar}" 
+                                     alt="${participantData.name}"
+                                     onerror="this.src='./assets/compiled/jpg/1.jpg'">
+                                <span class="online-indicator" 
+                                      title="${participantData.isOnline ? 'Online' : 'Offline'}"
+                                      style="position: absolute;
+                                             bottom: 0;
+                                             right: 0;
+                                             width: 10px;
+                                             height: 10px;
+                                             border-radius: 50%;
+                                             background: ${participantData.isOnline ? '#00b74a' : '#6c757d'};
+                                             border: 2px solid #fff;
+                                             box-shadow: 0 0 3px rgba(0,0,0,0.2);">
+                                </span>
+                            </div>
+                            <div>
+                                <div class="d-flex align-items-center">
+                                    <h6 class="mb-0">${participantData.name}</h6>
+                                    ${isCurrentUser ? '<small class="ms-2">(You)</small>' : ''}
+                                </div>
+                                <small class="text-muted d-block">${participantData.role}</small>
+                                <small class="text-${participantData.isOnline ? 'success' : 'muted'}">
+                                    ${participantData.isOnline ? 'Online' : 'Last seen: ' + new Date(participantData.lastSeen).toLocaleTimeString()}
+                                </small>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error updating participants list:', error);
+                const participantsList = document.querySelector('.participants-list');
+                participantsList.innerHTML = '<p class="text-danger">Error loading participants</p>';
+            }
+        });
+    
+        // Display chat messages
+        const messagesRef = db?.ref('messages');
+        const chatContainer = document.getElementById('chatContainer');
+    
+        messagesRef.on('child_added', async (snapshot) => {
+            try {
+            const messageData = snapshot.val();
+                const currentUser = await getUserProfile();
+                const isCurrentUser = currentUser && messageData.sender === currentUser.fullName;
+                
+            const messageElement = document.createElement('div');
+                messageElement.classList.add('message', isCurrentUser ? 'message-sent' : 'message-received');
+        
+                // Get participant info for the sender
+                const senderSnapshot = await participantsRef
+                    .orderByChild('name')
+                    .equalTo(messageData.sender)
+                    .once('value');
+                
+                const senderData = senderSnapshot.val();
+                const sender = senderData ? Object.values(senderData)[0] : null;
+                
+                const avatar = (isCurrentUser ? currentUser.profileImage : 
+                             (sender?.avatar || messageData.avatar)) || './assets/compiled/jpg/1.jpg';
+                
+                const timestamp = messageData.timestamp ? 
+                    new Date(messageData.timestamp).toLocaleTimeString([], { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    }) : 
+                    new Date().toLocaleTimeString([], { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    });
+    
+            messageElement.innerHTML = `
+                    <div class="message-header">
+                        ${!isCurrentUser ? `
+                            <div class="message-avatar-container">
+                                <img src="${avatar}" 
+                                     class="message-avatar" 
+                                     alt="${messageData.sender || 'Unknown User'}"
+                                     onerror="this.src='./assets/compiled/jpg/1.jpg'">
+                                ${sender ? `
+                                    <span class="online-indicator" 
+                                          title="${sender.isOnline ? 'Online' : 'Offline'}"
+                                          style="position: absolute;
+                                                 bottom: 0;
+                                                 right: 0;
+                                                 width: 8px;
+                                                 height: 8px;
+                                                 border-radius: 50%;
+                                                 background: ${sender.isOnline ? '#00b74a' : '#6c757d'};
+                                                 border: 2px solid #fff;
+                                                 box-shadow: 0 0 3px rgba(0,0,0,0.2);">
+                                    </span>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+                        <span class="message-meta">
+                            ${messageData.sender || 'Unknown User'}
+                            ${!isCurrentUser && sender ? `
+                                <small class="status-text ${sender.isOnline ? 'online-text' : 'offline-text'}">
+                                    ${sender.isOnline ? '(online)' : sender.lastSeen ? 
+                                    '(last seen: ' + new Date(sender.lastSeen).toLocaleTimeString([], {
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    }) + ')' : ''}
+                                </small>
+                            ` : ''}
+                        </span>
+                        ${isCurrentUser ? `
+                            <div class="message-avatar-container">
+                                <img src="${avatar}" 
+                                     class="message-avatar" 
+                                     alt="${messageData.sender || 'Unknown User'}"
+                                     onerror="this.src='./assets/compiled/jpg/1.jpg'">
+                                <span class="online-indicator online"
+                                      style="position: absolute;
+                                             bottom: 0;
+                                             right: 0;
+                                             width: 8px;
+                                             height: 8px;
+                                             border-radius: 50%;
+                                             background: #00b74a;
+                                             border: 2px solid #fff;
+                                             box-shadow: 0 0 3px rgba(0,0,0,0.2);">
+                                </span>
+                            </div>
+                        ` : ''}
+                    </div>
+                <div class="message-content">
+                        <p>${messageData.message || ''}</p>
+                        <div class="message-timestamp">${timestamp}</div>
+                </div>
+            `;
+    
+            chatContainer.appendChild(messageElement);
+            scrollToBottom();
+            } catch (error) {
+                console.error('Error displaying message:', error);
+            }
+        });
+    
+        // Send a message
+        document.getElementById('send-btn').onclick = async () => {
+            const messageInput = document.getElementById('chat-input');
+            const message = messageInput.value.trim();
+            const user = await getUserProfile();
+    
+            if (message && user) {
+                try {
+                    await messagesRef.push({
+                        sender: user.fullName,
+                        message: message,
+                        timestamp: new Date().toISOString(),
+                        avatar: user.profileImage
+                    });
+                    messageInput.value = '';
+                    messageInput.focus();
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    alert('Failed to send message. Please try again.');
+                }
+            }
+        };
+    
+        // Handle Enter key for sending messages
+        document.getElementById('chat-input').addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('send-btn').click();
+            }
+        });
+    
+        // Auto-scroll to bottom
+        function scrollToBottom() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    </script>
+        <script src='https://8x8.vc/vpaas-magic-cookie-79422990d9fe403cb65d098d39392d00/external_api.js' async></script>
+    <script type="text/javascript">
+        function startJitsiCall() {
+          const api = new JitsiMeetExternalAPI("8x8.vc", {
+            roomName: "vpaas-magic-cookie-79422990d9fe403cb65d098d39392d00/SampleAppFuriousStakesRealizeParticularly",
+            parentNode: document.querySelector('#jaas-container'),
+            // Make sure to include a JWT if you intend to record,
+            // make outbound calls or use any other premium features!
+            // jwt: "eyJraWQiOiJ2cGFhcy1tYWdpYy1jb29raWUtNzk0MjI5OTBkOWZlNDAzY2I2NWQwOThkMzkzOTJkMDAvMzUzMGM1LVNBTVBMRV9BUFAiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJqaXRzaSIsImlzcyI6ImNoYXQiLCJpYXQiOjE3NDE3NTU0NDUsImV4cCI6MTc0MTc2MjY0NSwibmJmIjoxNzQxNzU1NDQwLCJzdWIiOiJ2cGFhcy1tYWdpYy1jb29raWUtNzk0MjI5OTBkOWZlNDAzY2I2NWQwOThkMzkzOTJkMDAiLCJjb250ZXh0Ijp7ImZlYXR1cmVzIjp7ImxpdmVzdHJlYW1pbmciOmZhbHNlLCJvdXRib3VuZC1jYWxsIjpmYWxzZSwic2lwLW91dGJvdW5kLWNhbGwiOmZhbHNlLCJ0cmFuc2NyaXB0aW9uIjpmYWxzZSwicmVjb3JkaW5nIjpmYWxzZX0sInVzZXIiOnsiaGlkZGVuLWZyb20tcmVjb3JkZXIiOmZhbHNlLCJtb2RlcmF0b3IiOnRydWUsIm5hbWUiOiJUZXN0IFVzZXIiLCJpZCI6Imdvb2dsZS1vYXV0aDJ8MTE2MTI3NzgyMzQ3NzY3NTEyNjI4IiwiYXZhdGFyIjoiIiwiZW1haWwiOiJ0ZXN0LnVzZXJAY29tcGFueS5jb20ifX0sInJvb20iOiIqIn0.LgXcWUfz3pV04E9g5p35uOKWtQVlSCA2u9cfSmWBWArDYdodlyGVqyhWNHE9M9ZcBSfIkV0sMEh3rt9_RvCeNdK8hTYB_1JazBkEpcBu8zj-ZUemjKk3uViekp8yI6kugYdxy7BXy5b6smiqDUuUb0K4SFr9OvpC7P_aqaf1-Eq_fXDQZ5-WAEhrdL1XexqynzQNlwkx_i0tjHpajckjsGfOa4zVMygRJZGx_H4VcKzkUKyPlU8cr9Jn_m7DuPaN-GO5C15Iv3uYDBRVgDucUDujKd-5hOSyTD35SWmi4kTZ4-6uuUzKgjVdlp9hDoUM0ytOujUSNwYZPQuwU-ttCg"
+          });
+        }
+        
+    
+
+  
+      </script>
+    
+</body>
+</html>
