@@ -1,30 +1,13 @@
 import express from 'express';
-import jwt from 'jsonwebtoken';
+import { auth } from '../middleware/auth.js';
 import User from '../models/User.js';
 
 const router = express.Router();
 
-// Middleware to verify JWT token
-const verifyToken = (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    
-    if (!token) {
-        return res.status(401).json({ message: 'No token provided' });
-    }
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
-        next();
-    } catch (error) {
-        return res.status(401).json({ message: 'Invalid token' });
-    }
-};
-
 // Get user profile
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select('-password');
+        const user = await User.findById(req.user._id).select('-password');
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -36,7 +19,7 @@ router.get('/', verifyToken, async (req, res) => {
 });
 
 // Update user profile
-router.put('/', verifyToken, async (req, res) => {
+router.put('/', auth, async (req, res) => {
     try {
         const {
             fullName,
@@ -50,7 +33,7 @@ router.put('/', verifyToken, async (req, res) => {
             certifications
         } = req.body;
 
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(req.user._id);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
