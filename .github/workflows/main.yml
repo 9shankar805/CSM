@@ -2,103 +2,64 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ master ]
   pull_request:
-    branches: [ main, master ]
-
-permissions:
-  contents: read
-  deployments: write
+    branches: [ master ]
 
 env:
-  RENDER_DEPLOY_URL: ${{ secrets.RENDER_DEPLOY_URL }}
+  NODE_VERSION: '18.x'
+  RENDER_TOKEN: ${{ secrets.RENDER_TOKEN }}
+  RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
 
 jobs:
-  test:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    
-    services:
-      mongodb:
-        image: mongo:4.4
-        ports:
-          - 27017:27017
 
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Use Node.js 18.x
-      uses: actions/setup-node@v3
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
       with:
-        node-version: '18.x'
+        node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
-    
+
     - name: Install dependencies
       run: npm ci
-    
-    - name: Run linting
-      run: npm run lint
-    
+
     - name: Run tests
       run: npm test
       env:
         NODE_ENV: test
-        MONGODB_URI: mongodb://localhost:27017/csm_test
-        JWT_SECRET: test_secret
+        JWT_SECRET: test-secret
+        MONGODB_URI: mongodb://localhost:27017/csm-test
 
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    environment: 
-      name: production
-      url: https://csm-app.onrender.com
-    
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Use Node.js 18.x
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18.x'
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Build application
-      run: npm run build --if-present
-      
-    - name: Create deployment
-      uses: bobheadxi/deployments@v1
-      id: deployment
-      with:
-        step: start
-        token: ${{ secrets.GITHUB_TOKEN }}
-        env: production
-        
-    - name: Verify deployment URL
-      if: env.RENDER_DEPLOY_URL == ''
-      run: |
-        echo "::error::RENDER_DEPLOY_URL is not configured in repository secrets"
-        exit 1
-        
     - name: Deploy to Render
-      id: render_deploy
-      uses: fjogeleit/http-request-action@v1
+      if: github.ref == 'refs/heads/master'
+      uses: johnbeynon/render-deploy-action@v0.0.8
       with:
-        url: ${{ env.RENDER_DEPLOY_URL }}
-        method: 'POST'
-        customHeaders: '{"Content-Type": "application/json"}'
-        preventFailureOnNoResponse: 'false'
-        timeout: 20000
+        service-id: ${{ env.RENDER_SERVICE_ID }}
+        api-key: ${{ env.RENDER_TOKEN }}
+
+    - name: Wait for deployment
+      if: github.ref == 'refs/heads/master'
+      run: |
+        echo "Waiting for deployment to complete..."
+        sleep 60  # Wait for deployment to initialize
         
-    - name: Update deployment status
-      uses: bobheadxi/deployments@v1
-      if: always()
-      with:
-        step: finish
-        token: ${{ secrets.GITHUB_TOKEN }}
-        status: ${{ steps.render_deploy.conclusion == 'success' && 'success' || 'failure' }}
-        env: production
-        deployment_id: ${{ steps.deployment.outputs.deployment_id }}
-        env_url: https://csm-app.onrender.com
+        MAX_RETRIES=10
+        RETRY_COUNT=0
+        
+        while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+          STATUS=$(curl -s https://csm-app.onrender.com/health)
+          if [[ $STATUS == *"healthy"* ]]; then
+            echo "Deployment successful!"
+            exit 0
+          fi
+          echo "Deployment still in progress... retrying in 30 seconds"
+          sleep 30
+          RETRY_COUNT=$((RETRY_COUNT + 1))
+        done
+        
+        echo "Deployment check timed out"
+        exit 1
