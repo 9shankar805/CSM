@@ -1,4 +1,21 @@
-# CSM - Client Service Management System
+# Career Management System (CSM)
+
+A modern web application for managing career development and employee profiles.
+
+## Features
+- User Authentication
+- Profile Management
+- Employee Management
+- Role-based Access Control
+
+## Deployment
+The application is automatically deployed to Render through GitHub Actions CI/CD pipeline.
+
+## Tech Stack
+- Node.js
+- Express
+- MongoDB
+- JWT Authentication
 
 ## Deployment Guide
 
@@ -38,12 +55,6 @@ If needed, update API endpoints in your frontend code to point to your new produ
 2. Create `.env` file using `.env.example` as template
 3. Start server: `npm start`
 4. Access at: `http://localhost:8888`
-
-## Tech Stack
-- Backend: Node.js + Express
-- Database: MongoDB
-- Authentication: JWT
-- Frontend: HTML, CSS, JavaScript
 
 ## API Endpoints
 - POST `/api/auth/register` - Register new user
