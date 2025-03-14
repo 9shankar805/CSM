@@ -146,6 +146,8 @@ const PORT = process.env.PORT || 8888;
 const server = app.listen(PORT, () => {
     console.log(`✨ CSM Server is running on port ${PORT}`);
     console.log(`🌐 Environment: ${process.env.NODE_ENV}`);
+    console.log(`📊 MongoDB Status: Connected`);
+    console.log(`🚀 Server URL: ${process.env.NODE_ENV === 'production' ? 'https://csm-app.onrender.com' : `http://localhost:${PORT}`}`);
 });
 
 // Handle unhandled promise rejections
