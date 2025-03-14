@@ -8,11 +8,9 @@ on:
 
 env:
   NODE_VERSION: '18.x'
-  RENDER_TOKEN: ${{ secrets.RENDER_TOKEN }}
-  RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
 
 jobs:
-  build-and-deploy:
+  build-and-test:
     runs-on: ubuntu-latest
 
     services:
@@ -20,6 +18,11 @@ jobs:
         image: mongo:4.4
         ports:
           - 27017:27017
+        options: >-
+          --health-cmd mongosh
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
     - uses: actions/checkout@v4
@@ -40,15 +43,19 @@ jobs:
         JWT_SECRET: test-secret
         MONGODB_URI: mongodb://localhost:27017/csm-test
 
+  deploy:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    
+    steps:
     - name: Deploy to Render
-      if: github.ref == 'refs/heads/master'
       uses: johnbeynon/render-deploy-action@v0.0.8
       with:
-        service-id: ${{ env.RENDER_SERVICE_ID }}
-        api-key: ${{ env.RENDER_TOKEN }}
+        service-id: ${{ secrets.RENDER_SERVICE_ID }}
+        api-key: ${{ secrets.RENDER_TOKEN }}
 
     - name: Wait for deployment
-      if: github.ref == 'refs/heads/master'
       run: |
         echo "Waiting for deployment to complete..."
         sleep 60  # Wait for deployment to initialize

@@ -1,5 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import generateToken from '../utils/generateToken.js';
 import { auth } from '../middleware/auth.js';
@@ -25,17 +26,17 @@ router.post('/register', async (req, res) => {
             certifications
         } = req.body;
 
-        // Check if user exists
-        const userExists = await User.findOne({ email: email.toLowerCase() });
-        if (userExists) {
+        // Check if user already exists
+        const existingUser = await User.findOne({ email: email.toLowerCase() });
+        if (existingUser) {
             return res.status(400).json({
                 success: false,
                 message: 'User already exists'
             });
         }
 
-        // Create user - password will be hashed by the User model's pre-save middleware
-        const user = await User.create({
+        // Create new user
+        const user = new User({
             name: fullName,
             fullName,
             email: email.toLowerCase(),
@@ -55,30 +56,31 @@ router.post('/register', async (req, res) => {
             lastLogin: new Date()
         });
 
-        if (user) {
-            const token = generateToken(user._id, user.role);
-            res.status(201).json({
-                success: true,
-                token,
-                user: {
-                    id: user._id,
-                    name: user.name,
-                    fullName: user.fullName,
-                    email: user.email,
-                    role: user.role,
-                    permissions: user.permissions,
-                    profileImage: user.profileImage,
-                    jobTitle: user.jobTitle,
-                    location: user.location,
-                    phone: user.phone
-                }
-            });
-        }
+        await user.save();
+
+        // Generate JWT token
+        const token = generateToken(user._id, user.role);
+
+        res.status(201).json({
+            success: true,
+            token,
+            user: {
+                id: user._id,
+                fullName: user.fullName,
+                email: user.email,
+                role: user.role,
+                permissions: user.permissions,
+                profileImage: user.profileImage,
+                jobTitle: user.jobTitle,
+                location: user.location,
+                phone: user.phone
+            }
+        });
     } catch (error) {
         console.error('Registration error:', error);
         res.status(500).json({
             success: false,
-            message: 'Failed to register user'
+            message: 'Error registering user'
         });
     }
 });
@@ -87,8 +89,8 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        
-        // Find user by email
+
+        // Find user
         const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
         if (!user) {
             return res.status(401).json({
@@ -98,7 +100,7 @@ router.post('/login', async (req, res) => {
         }
 
         // Check password
-        const isMatch = await user.comparePassword(password);
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({
                 success: false,
@@ -111,9 +113,9 @@ router.post('/login', async (req, res) => {
         user.lastLogin = new Date();
         await user.save();
 
-        // Generate token
+        // Generate JWT token
         const token = generateToken(user._id, user.role);
-        
+
         res.json({
             success: true,
             token,
@@ -130,7 +132,7 @@ router.post('/login', async (req, res) => {
         console.error('Login error:', error);
         res.status(500).json({
             success: false,
-            message: 'Server error during login'
+            message: 'Error logging in'
         });
     }
 });
