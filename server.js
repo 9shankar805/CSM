@@ -85,20 +85,21 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Connect to MongoDB and start server
-const PORT = process.env.PORT || 8888;
-
-try {
-    await connectDB();
-    app.listen(PORT, () => {
-        console.log(`✨ CSM Server is running on port ${PORT}`);
-        console.log(`🌐 Environment: ${process.env.NODE_ENV}`);
-        console.log(`📊 MongoDB Status: Connected`);
-        console.log(`🚀 Server URL: ${process.env.NODE_ENV === 'production' ? 'https://csm-app.onrender.com' : `http://localhost:${PORT}`}`);
-    });
-} catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
+// Start server if not in test mode
+if (process.env.NODE_ENV !== 'test') {
+    const PORT = process.env.PORT || 8888;
+    try {
+        await connectDB();
+        app.listen(PORT, () => {
+            console.log(`✨ CSM Server is running on port ${PORT}`);
+            console.log(`🌐 Environment: ${process.env.NODE_ENV}`);
+            console.log(`📊 MongoDB Status: Connected`);
+            console.log(`🚀 Server URL: ${process.env.NODE_ENV === 'production' ? 'https://csm-app.onrender.com' : `http://localhost:${PORT}`}`);
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
 }
 
 // Handle unhandled promise rejections
@@ -106,3 +107,5 @@ process.on('unhandledRejection', (err) => {
     console.error('Unhandled Promise Rejection:', err);
     process.exit(1);
 });
+
+export default app;
