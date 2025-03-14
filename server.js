@@ -144,7 +144,8 @@ app.use((err, req, res, next) => {
 // Start server
 const PORT = process.env.PORT || 8888;
 const server = app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
+    console.log(`✨ CSM Server is running on port ${PORT}`);
+    console.log(`🌐 Environment: ${process.env.NODE_ENV}`);
 });
 
 // Handle unhandled promise rejections
