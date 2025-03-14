@@ -27,6 +27,16 @@ app.use((req, res, next) => {
     next();
 });
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV,
+        dbStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    });
+});
+
 // Serve static files from the Admin directory
 app.use(express.static(join(__dirname, 'Admin')));
 
