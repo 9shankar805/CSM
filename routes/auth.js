@@ -1,9 +1,10 @@
-const express = require('express');
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
+import generateToken from '../utils/generateToken.js';
+import auth from '../middleware/auth.js';
+
 const router = express.Router();
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const generateToken = require('../utils/generateToken');
-const auth = require('../middleware/auth');
 
 // Register route
 router.post('/register', async (req, res) => {
@@ -176,4 +177,4 @@ router.get('/current-user', auth, async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

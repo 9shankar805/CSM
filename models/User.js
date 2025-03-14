@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -8,20 +8,22 @@ const userSchema = new mongoose.Schema({
     },
     fullName: {
         type: String,
-        required: true
+        required: [true, 'Please provide your full name'],
+        trim: true
     },
     email: {
         type: String,
-        required: true,
+        required: [true, 'Please provide your email'],
         unique: true,
         trim: true,
-        lowercase: true
+        lowercase: true,
+        match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email']
     },
     password: {
         type: String,
-        required: true,
-        select: false,
-        minlength: [6, 'Password must be at least 6 characters']
+        required: [true, 'Please provide a password'],
+        minlength: [6, 'Password must be at least 6 characters'],
+        select: false
     },
     role: {
         type: String,
@@ -122,28 +124,28 @@ userSchema.pre('save', function(next) {
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {
+    if (!this.isModified('password')) {
+        return next();
+    }
+
     try {
-        if (!this.isModified('password')) {
-            return next();
-        }
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
-        return next();
+        next();
     } catch (error) {
-        return next(error);
+        next(error);
     }
 });
 
 // Compare password method
 userSchema.methods.comparePassword = async function(candidatePassword) {
     try {
-        if (!this.password) {
-            throw new Error('Password not found');
-        }
         return await bcrypt.compare(candidatePassword, this.password);
     } catch (error) {
-        throw new Error('Password comparison failed');
+        throw new Error('Error comparing passwords');
     }
 };
 
-module.exports = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+
+export default User;
