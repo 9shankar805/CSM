@@ -23,6 +23,7 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.14.2",
     "mongoose": "^8.1.1"
   },
   "devDependencies": {
@@ -42,12 +43,17 @@
   "jest": {
     "testEnvironment": "node",
     "transform": {},
-    "testMatch": ["**/__tests__/**/*.test.js"],
-    "setupFiles": ["./__tests__/setup.js"],
+    "testMatch": [
+      "**/__tests__/**/*.test.js"
+    ],
+    "setupFiles": [
+      "./__tests__/setup.js"
+    ],
     "verbose": true,
     "forceExit": true,
     "clearMocks": true,
     "resetMocks": true,
-    "restoreMocks": true
+    "restoreMocks": true,
+    "extensionsToTreatAsEsm": [".js"]
   }
 }
