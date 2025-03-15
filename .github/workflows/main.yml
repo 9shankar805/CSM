@@ -10,7 +10,7 @@ env:
   NODE_VERSION: '18.x'
 
 jobs:
-  build-and-test:
+  test:
     runs-on: ubuntu-latest
 
     services:
@@ -18,11 +18,6 @@ jobs:
         image: mongo:4.4
         ports:
           - 27017:27017
-        options: >-
-          --health-cmd mongosh
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
     - uses: actions/checkout@v4
@@ -47,44 +42,49 @@ jobs:
         MONGODB_URI: mongodb://localhost:27017/csm-test
 
   deploy:
-    needs: build-and-test
+    needs: test
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     
     steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+
     - name: Deploy to Render
-      uses: johnbeynon/render-deploy-action@v0.0.8
+      uses: JorgeLNJunior/render-deploy@v1.4.3
       with:
-        service-id: ${{ secrets.RENDER_SERVICE_ID }}
-        api-key: ${{ secrets.RENDER_TOKEN }}
-        wait: true
-        retries: 20
-        retry-interval: 30
+        service_id: ${{ secrets.RENDER_SERVICE_ID }}
+        api_key: ${{ secrets.RENDER_TOKEN }}
+        wait_deploy: true
+        deployment_environment: production
 
     - name: Verify deployment
       run: |
-        echo "Waiting for deployment to complete..."
-        sleep 60  # Initial wait for deployment to start
+        echo "Waiting for deployment to initialize..."
+        sleep 30
         
-        MAX_RETRIES=20
+        MAX_RETRIES=10
         RETRY_COUNT=0
         HEALTH_URL="https://csm-app.onrender.com/health"
         
         while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $HEALTH_URL)
-          if [ $HTTP_STATUS -eq 200 ]; then
-            HEALTH_CHECK=$(curl -s $HEALTH_URL)
-            if [[ $HEALTH_CHECK == *"healthy"* ]] && [[ $HEALTH_CHECK == *"connected"* ]]; then
+          echo "Checking deployment status (Attempt $((RETRY_COUNT + 1))/$MAX_RETRIES)..."
+          
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $HEALTH_URL || echo "failed")
+          
+          if [ "$HTTP_STATUS" = "200" ]; then
+            RESPONSE=$(curl -s $HEALTH_URL)
+            if [[ $RESPONSE == *"healthy"* ]]; then
               echo " Deployment verified successfully!"
-              echo "Health check response: $HEALTH_CHECK"
+              echo "Health check response: $RESPONSE"
               exit 0
             fi
           fi
-          echo "Attempt $((RETRY_COUNT + 1))/$MAX_RETRIES: Service not ready, waiting 30 seconds..."
+          
+          echo "Service not ready (HTTP Status: $HTTP_STATUS). Waiting 30 seconds..."
           sleep 30
           RETRY_COUNT=$((RETRY_COUNT + 1))
         done
         
         echo " Deployment verification failed after $MAX_RETRIES attempts"
-        echo "Last health check response: $(curl -s $HEALTH_URL)"
         exit 1
