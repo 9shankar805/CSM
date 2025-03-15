@@ -36,6 +36,9 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
+    - name: Run linting
+      run: npm run lint
+
     - name: Run tests
       run: npm test
       env:
@@ -54,25 +57,34 @@ jobs:
       with:
         service-id: ${{ secrets.RENDER_SERVICE_ID }}
         api-key: ${{ secrets.RENDER_TOKEN }}
+        wait: true
+        retries: 20
+        retry-interval: 30
 
-    - name: Wait for deployment
+    - name: Verify deployment
       run: |
         echo "Waiting for deployment to complete..."
-        sleep 60  # Wait for deployment to initialize
+        sleep 60  # Initial wait for deployment to start
         
-        MAX_RETRIES=10
+        MAX_RETRIES=20
         RETRY_COUNT=0
+        HEALTH_URL="https://csm-app.onrender.com/health"
         
         while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-          STATUS=$(curl -s https://csm-app.onrender.com/health)
-          if [[ $STATUS == *"healthy"* ]]; then
-            echo "Deployment successful!"
-            exit 0
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $HEALTH_URL)
+          if [ $HTTP_STATUS -eq 200 ]; then
+            HEALTH_CHECK=$(curl -s $HEALTH_URL)
+            if [[ $HEALTH_CHECK == *"healthy"* ]] && [[ $HEALTH_CHECK == *"connected"* ]]; then
+              echo " Deployment verified successfully!"
+              echo "Health check response: $HEALTH_CHECK"
+              exit 0
+            fi
           fi
-          echo "Deployment still in progress... retrying in 30 seconds"
+          echo "Attempt $((RETRY_COUNT + 1))/$MAX_RETRIES: Service not ready, waiting 30 seconds..."
           sleep 30
           RETRY_COUNT=$((RETRY_COUNT + 1))
         done
         
-        echo "Deployment check timed out"
+        echo " Deployment verification failed after $MAX_RETRIES attempts"
+        echo "Last health check response: $(curl -s $HEALTH_URL)"
         exit 1

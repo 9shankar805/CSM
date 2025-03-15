@@ -3,16 +3,26 @@ services:
     name: csm-app
     env: node
     plan: free
-    buildCommand: npm ci
+    buildCommand: |
+      npm ci
+      npm run build
     startCommand: node server.js
     healthCheckPath: /health
+    healthCheckTimeout: 300
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 8888
+        value: 10000
       - key: MONGODB_URI
         sync: false
       - key: JWT_SECRET
         sync: false
     autoDeploy: true
+    scaling:
+      minInstances: 1
+      maxInstances: 1
+    disk:
+      name: tmp
+      mountPath: /tmp
+      sizeGB: 0.5
